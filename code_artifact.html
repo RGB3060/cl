@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КИБЕР-КЛИКЕР // NEON PROTOCOL</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        cyber: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#070913',
+                            card: '#0f1428',
+                            border: '#1e294b',
+                            cyan: '#00f3ff',
+                            pink: '#ff007f',
+                            purple: '#9d00ff',
+                            yellow: '#fcee0a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070913;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(0, 243, 255, 0.08) 0%, transparent 35%),
+                radial-gradient(circle at 85% 80%, rgba(255, 0, 127, 0.08) 0%, transparent 35%),
+                linear-gradient(to bottom, rgba(15, 20, 40, 0.4) 1px, transparent 1px),
+                linear-gradient(to right, rgba(15, 20, 40, 0.4) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: #e2e8f0;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Неоновое свечение */
+        .neon-cyan {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.35), inset 0 0 15px rgba(0, 243, 255, 0.15);
+        }
+        .neon-pink {
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.35), inset 0 0 15px rgba(255, 0, 127, 0.15);
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.7);
+        }
+
+        /* Анимация главного ядра для клика */
+        .core-btn {
+            transition: transform 0.06s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+        }
+        .core-btn:active, .core-btn.clicked {
+            transform: scale(0.92);
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.06); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        .ring-animate {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin-slow {
+            animation: spin-slow 18s linear infinite;
+        }
+
+        /* Всплывающий текст при клике */
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(0.9); }
+            40% { opacity: 1; transform: translateY(-35px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-85px) scale(0.85); }
+        }
+        .floating-number {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: float-up 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070913;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e294b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f3ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ НАВИГАЦИИ -->
+    <header class="border-b border-cyber-border bg-cyber-bg/90 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Логотип -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyber-cyan to-blue-600 flex items-center justify-center shadow-lg shadow-cyber-cyan/20">
+                    <i class="fa-solid fa-microchip text-cyber-bg text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-cyber font-black text-lg md:text-xl tracking-wider text-white flex items-center gap-2">
+                        CYBER<span class="text-cyber-cyan neon-text-cyan">CLICKER</span>
+                        <span class="text-[10px] font-sans bg-cyber-pink/20 text-cyber-pink border border-cyber-pink/40 px-2 py-0.5 rounded-full uppercase">v2.5 Online</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Квантовый майнинг & Глобальный рейтинг</p>
+                </div>
+            </div>
+
+            <!-- Профиль и Кнопки Управления -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <!-- Никнейм игрока -->
+                <div class="flex items-center bg-cyber-card border border-cyber-border rounded-xl px-3 py-1.5">
+                    <i class="fa-solid fa-user-astronaut text-cyber-cyan mr-2 text-sm"></i>
+                    <input id="nickname-input" type="text" maxlength="18" placeholder="Ваш никнейм..." 
+                        class="bg-transparent text-sm text-white focus:outline-none w-28 sm:w-36 font-medium"
+                        value="КиберНовичок">
+                    <button id="save-name-btn" title="Сохранить ник в рейтинг" class="ml-2 text-xs bg-cyber-cyan/10 hover:bg-cyber-cyan/25 text-cyber-cyan border border-cyber-cyan/30 px-2 py-1 rounded-lg transition">
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+
+                <!-- Статус облака -->
+                <div id="cloud-status" class="hidden sm:flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400" title="Статус синхронизации с облаком">
+                    <span id="cloud-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="cloud-text">Подключение...</span>
+                </div>
+
+                <!-- Звук Вкл/Выкл -->
+                <button id="sound-toggle" class="w-9 h-9 rounded-xl bg-cyber-card border border-cyber-border hover:border-cyber-cyan text-slate-300 hover:text-cyber-cyan flex items-center justify-center transition" title="Звуковые эффекты">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- ЛЕВАЯ КОЛОНКА: КЛИКЕР И СТАТИСТИКА (5 колонок на десктопе) -->
+        <section class="lg:col-span-5 flex flex-col gap-5">
+            
+            <!-- Карточка баланса и статов -->
+            <div class="bg-cyber-card/90 border border-cyber-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-36 h-36 bg-cyber-cyan/5 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs uppercase tracking-widest text-slate-400 font-semibold">Текущий баланс</span>
+                    <span id="rank-badge" class="text-xs font-cyber px-2.5 py-0.5 rounded-full bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30">
+                        Ранг: Новичок
+                    </span>
+                </div>
+
+                <!-- Главный счетчик монет -->
+                <div class="flex items-baseline gap-2 my-1">
+                    <i class="fa-solid fa-coins text-cyber-yellow text-2xl sm:text-3xl"></i>
+                    <span id="coins-display" class="font-cyber font-black text-3xl sm:text-5xl text-white tracking-tight neon-text-cyan">0</span>
+                    <span class="text-xs text-slate-400 font-semibold uppercase">CYB</span>
+                </div>
+
+                <!-- Статистика в сетке -->
+                <div class="grid grid-cols-3 gap-2.5 mt-4 pt-4 border-t border-slate-800/80">
+                    <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800/70">
+                        <div class="text-[11px] text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-hand-pointer text-cyber-cyan"></i> За клик
+                        </div>
+                        <div id="cpc-display" class="font-cyber font-bold text-sm sm:text-base text-white mt-0.5">+1</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800/70">
+                        <div class="text-[11px] text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-cyber-pink"></i> В секунду
+                        </div>
+                        <div id="cps-display" class="font-cyber font-bold text-sm sm:text-base text-cyber-pink mt-0.5">+0/с</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800/70">
+                        <div class="text-[11px] text-slate-400 flex items-center gap-1">
+                            <i class="fa-solid fa-star text-amber-400"></i> Бонус престижа
+                        </div>
+                        <div id="prestige-mult-display" class="font-cyber font-bold text-sm sm:text-base text-amber-400 mt-0.5">x1.0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Игровая Зона Кликера -->
+            <div class="bg-cyber-card/90 border border-cyber-border rounded-2xl p-6 flex flex-col items-center justify-center relative min-h-[340px] shadow-xl overflow-hidden">
+                
+                <!-- Полоса комбо и крит-шанса -->
+                <div class="w-full flex justify-between items-center mb-4 text-xs">
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <i class="fa-solid fa-fire text-orange-400"></i>
+                        <span>Комбо: <strong id="combo-display" class="font-cyber text-orange-400">x1.0</strong></span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-300">
+                        <i class="fa-solid fa-crosshairs text-cyber-cyan"></i>
+                        <span>Шанс крита: <strong id="crit-display" class="font-cyber text-cyber-cyan">5% (x3)</strong></span>
+                    </div>
+                </div>
+
+                <!-- Прогресс-бар комбо -->
+                <div class="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden mb-8 border border-slate-800">
+                    <div id="combo-bar" class="h-full bg-gradient-to-r from-cyber-cyan via-purple-500 to-cyber-pink transition-all duration-150" style="width: 0%"></div>
+                </div>
+
+                <!-- Кнопка Ядра -->
+                <div class="relative flex items-center justify-center my-2">
+                    <!-- Внешнее вращающееся кольцо -->
+                    <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full border-2 border-dashed border-cyber-cyan/30 absolute spin-slow pointer-events-none"></div>
+                    <!-- Пульсирующий ореол -->
+                    <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-cyber-cyan/10 absolute ring-animate pointer-events-none"></div>
+
+                    <!-- Главная кнопка -->
+                    <button id="main-click-btn" class="core-btn relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-b from-slate-900 via-cyber-card to-slate-950 border-4 border-cyber-cyan neon-cyan flex flex-col items-center justify-center group focus:outline-none">
+                        <div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-gradient-to-tr from-cyber-cyan/20 via-purple-600/20 to-cyber-pink/20 flex flex-col items-center justify-center border border-white/10 group-hover:border-cyber-cyan/60 transition">
+                            <i class="fa-solid fa-atom text-5xl sm:text-6xl text-cyber-cyan group-hover:scale-110 transition-transform duration-200 neon-text-cyan"></i>
+                            <span class="font-cyber font-bold text-xs tracking-widest uppercase text-slate-300 mt-2">КЛИКАЙ</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Нижняя строка статистики кликов -->
+                <div class="w-full flex justify-between items-center mt-8 pt-3 border-t border-slate-800/70 text-xs text-slate-400">
+                    <span>Всего заработано: <strong id="total-earned-display" class="text-slate-200 font-cyber">0</strong></span>
+                    <span>Кликов: <strong id="total-clicks-display" class="text-slate-200 font-cyber">0</strong></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ПРАВАЯ КОЛОНКА: МАГАЗИН, ПРЕСТИЖ И РЕЙТИНГ (7 колонок на десктопе) -->
+        <section class="lg:col-span-7 bg-cyber-card/90 border border-cyber-border rounded-2xl shadow-xl flex flex-col overflow-hidden min-h-[600px]">
+            
+            <!-- Навигация по вкладкам -->
+            <div class="grid grid-cols-4 border-b border-cyber-border bg-slate-950/60 p-1.5 gap-1.5">
+                <button data-tab="tab-click" class="tab-btn active-tab flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40">
+                    <i class="fa-solid fa-hand-sparkles"></i>
+                    <span>Клик</span>
+                </button>
+                <button data-tab="tab-auto" class="tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>Авто-ферма</span>
+                </button>
+                <button data-tab="tab-prestige" class="tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent">
+                    <i class="fa-solid fa-dna"></i>
+                    <span>Престиж</span>
+                </button>
+                <button data-tab="tab-leaderboard" class="tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent">
+                    <i class="fa-solid fa-trophy text-amber-400"></i>
+                    <span>Рейтинг</span>
+                </button>
+            </div>
+
+            <!-- СОДЕРЖИМОЕ ВКЛАДОК -->
+            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between overflow-y-auto max-h-[540px]">
+
+                <!-- ВКЛАДКА 1: УЛУЧШЕНИЯ КЛИКА -->
+                <div id="tab-click" class="tab-pane space-y-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h2 class="font-cyber font-bold text-base text-white">Модификации Имплантов</h2>
+                            <p class="text-xs text-slate-400">Увеличивают количество монет за каждое нажатие</p>
+                        </div>
+                        <span class="text-xs bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-slate-300">Активный доход</span>
+                    </div>
+                    <div id="click-upgrades-list" class="space-y-2.5">
+                        <!-- Генерируется через JS -->
+                    </div>
+                </div>
+
+                <!-- ВКЛАДКА 2: АВТО-ДОХОД -->
+                <div id="tab-auto" class="tab-pane hidden space-y-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h2 class="font-cyber font-bold text-base text-white">Автономные Нейросети</h2>
+                            <p class="text-xs text-slate-400">Добывают кибер-монеты каждую секунду без вашего участия</p>
+                        </div>
+                        <span class="text-xs bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-cyber-pink">Пассивный майнинг</span>
+                    </div>
+                    <div id="auto-upgrades-list" class="space-y-2.5">
+                        <!-- Генерируется через JS -->
+                    </div>
+                </div>
+
+                <!-- ВКЛАДКА 3: ПРЕСТИЖ (ПЕРЕЗАГРУЗКА) -->
+                <div id="tab-prestige" class="tab-pane hidden space-y-4">
+                    <div class="bg-gradient-to-br from-purple-950/60 via-slate-900 to-pink-950/40 border border-purple-500/40 rounded-2xl p-5 text-center">
+                        <div class="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center mx-auto mb-3 text-purple-300 text-3xl">
+                            <i class="fa-solid fa-infinity"></i>
+                        </div>
+                        <h3 class="font-cyber font-bold text-xl text-white">Квантовая Перезагрузка (Престиж)</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto mt-2 leading-relaxed">
+                            Сбросьте текущие монеты и улучшения, чтобы получить <span class="text-amber-400 font-semibold">Квантовые Ядра</span>. Каждое ядро навсегда увеличивает весь ваш доход на <span class="text-cyber-cyan font-bold">+50%</span>!
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-3 my-5 max-w-md mx-auto">
+                            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3">
+                                <span class="text-xs text-slate-400 block">Текущий уровень престижа</span>
+                                <span id="prestige-level-Text" class="font-cyber font-bold text-xl text-amber-400 mt-1 block">0</span>
+                            </div>
+                            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3">
+                                <span class="text-xs text-slate-400 block">Награда за сброс</span>
+                                <span id="prestige-reward-Text" class="font-cyber font-bold text-xl text-cyber-cyan mt-1 block">+0 ядер</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mb-4">
+                            Минимум для первого престижа: <strong class="text-white font-cyber">50,000</strong> всего заработанных монет.
+                        </p>
+
+                        <button id="prestige-btn" disabled class="w-full max-w-sm mx-auto py-3 px-6 rounded-xl font-cyber font-bold text-sm uppercase tracking-wider transition disabled:opacity-40 disabled:cursor-not-allowed bg-gradient-to-r from-purple-600 to-cyber-pink text-white shadow-lg shadow-purple-600/30 hover:opacity-95">
+                            Выполнить Перезагрузку
+                        </button>
+                    </div>
+
+                    <!-- Дополнительные действия с сохранением -->
+                    <div class="border border-slate-800 rounded-xl p-4 bg-slate-950/40 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h4 class="text-sm font-semibold text-white">Управление данными</h4>
+                            <p class="text-xs text-slate-400">Принудительная синхронизация с облаком или полный сброс</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="force-sync-btn" class="text-xs bg-cyber-cyan/15 hover:bg-cyber-cyan/25 text-cyber-cyan border border-cyber-cyan/30 px-3 py-2 rounded-lg font-medium transition">
+                                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Обновить в рейтинге
+                            </button>
+                            <button id="hard-reset-btn" class="text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-3 py-2 rounded-lg font-medium transition">
+                                <i class="fa-solid fa-trash mr-1"></i> Полный сброс
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ВКЛАДКА 4: ГЛОБАЛЬНЫЙ РЕЙТИНГ ИГРОКОВ -->
+                <div id="tab-leaderboard" class="tab-pane hidden space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div>
+                            <h2 class="font-cyber font-bold text-base text-white flex items-center gap-2">
+                                <i class="fa-solid fa-globe text-cyber-cyan"></i> Глобальный Рейтинг (Live)
+                            </h2>
+                            <p class="text-xs text-slate-400">Обновляется в реальном времени среди всех игроков</p>
+                        </div>
+                        <button id="refresh-lb-btn" class="text-xs bg-slate-900 hover:bg-slate-800 text-cyber-cyan border border-cyber-border px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-rotate"></i> Синхронизировать мой счёт
+                        </button>
+                    </div>
+
+                    <!-- Таблица лидеров -->
+                    <div class="overflow-x-auto rounded-xl border border-cyber-border bg-slate-950/60">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-[11px] uppercase text-slate-400 bg-slate-900/80">
+                                    <th class="py-2.5 px-3">#</th>
+                                    <th class="py-2.5 px-3">Игрок</th>
+                                    <th class="py-2.5 px-3 text-right">Всего добыто</th>
+                                    <th class="py-2.5 px-3 text-right hidden sm:table-cell">Авто-доход</th>
+                                    <th class="py-2.5 px-3 text-center">Престиж</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body" class="divide-y divide-slate-800/60 text-xs sm:text-sm">
+                                <tr>
+                                    <td colspan="5" class="py-8 text-center text-slate-400">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-cyber-cyan mr-2"></i> Загрузка глобального рейтинга...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 flex items-center justify-between pt-2">
+                        <span>Ваш ID: <code id="user-id-display" class="text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded">ожидание...</code></span>
+                        <span>Авто-отправка рекорда каждые 10 сек.</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- МОДАЛЬНОЕ ОКНО: КАК ПОСТАВИТЬ ИГРУ НА САЙТ -->
+    <div id="deploy-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-cyber-card border border-cyber-cyan/50 rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Шапка модалки -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-cyber-border bg-slate-950">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-server text-cyber-cyan text-lg"></i>
+                    <h3 class="font-cyber font-bold text-base sm:text-lg text-white">Как выложить эту игру на свой сайт (Бесплатно)</h3>
+                </div>
+                <button id="close-deploy-modal" class="text-slate-400 hover:text-white w-8 h-8 rounded-lg flex items-center justify-center bg-slate-900">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Контент инструкции -->
+            <div class="p-6 overflow-y-auto space-y-5 text-sm text-slate-300 leading-relaxed">
+                <div class="bg-cyber-cyan/10 border border-cyber-cyan/30 rounded-xl p-4 text-xs sm:text-sm">
+                    <strong class="text-cyber-cyan block mb-1"><i class="fa-solid fa-circle-check mr-1"></i> Всё уже готово в одном файле!</strong>
+                    Вся игра (графика, звуковой движок, прокачка и таблица лидеров) полностью упакована в этот единственный файл <code class="bg-slate-900 px-1.5 py-0.5 rounded text-white">index.html</code>. Чтобы игра появилась в интернете по вашей ссылке, выберите любой из 3 бесплатных способов ниже:
+                </div>
+
+                <!-- Способ 1: Netlify Drop (Самый быстрый за 30 секунд) -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold text-white text-base flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-cyber-pink text-white text-xs flex items-center justify-center font-cyber">1</span>
+                        Самый простой способ за 30 секунд (Netlify Drop / Tiiny.host)
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-1.5 text-xs sm:text-sm text-slate-300">
+                        <li>Скопируйте код этой игры и сохраните его на компьютере под именем <code class="text-cyber-cyan font-mono">index.html</code> в отдельную папку.</li>
+                        <li>Зайдите на сайт <span class="text-white font-semibold">app.netlify.com/drop</span> (или <span class="text-white font-semibold">vercel.com</span>).</li>
+                        <li>Просто перетащите папку с вашим файлом <code class="text-cyber-cyan font-mono">index.html</code> прямо в окно браузера.</li>
+                        <li>Через 5 секунд вы получите готовую публичную ссылку вида <code class="text-amber-300">ваш-кликер.netlify.app</code>, которую можно скинуть друзьям!</li>
+                    </ol>
+                </div>
+
+                <!-- Способ 2: GitHub Pages -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold text-white text-base flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-cyber-cyan text-slate-950 text-xs flex items-center justify-center font-cyber font-bold">2</span>
+                        Надёжный хостинг через GitHub Pages (Навсегда и бесплатно)
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-1.5 text-xs sm:text-sm text-slate-300">
+                        <li>Зарегистрируйтесь на <span class="text-white font-semibold">github.com</span> и нажмите <strong>New Repository</strong>.</li>
+                        <li>Назовите репозиторий (например, <code class="text-cyber-cyan">cyber-clicker</code>), сделайте его <strong>Public</strong>.</li>
+                        <li>Нажмите <strong>Add file → Upload files</strong>, загрузите файл <code class="text-cyber-cyan">index.html</code> и нажмите <strong>Commit changes</strong>.</li>
+                        <li>Перейдите во вкладку <strong>Settings → Pages</strong> и в разделе <strong>Branch</strong> выберите <code class="text-white">main</code> и нажмите <strong>Save</strong>.</li>
+                        <li>Через 1 минуту игра будет доступна по адресу <code class="text-amber-300">https://ваш-логин.github.io/cyber-clicker/</code>.</li>
+                    </ol>
+                </div>
+
+                <!-- Способ 3: Свой Firebase для глобального рейтинга на внешнем домене -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold text-white text-base flex items-center gap-2 mb-2">
+                        <span class="w-6 h-6 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center font-cyber">3</span>
+                        Что нужно для работы онлайн-рейтинга на своем домене?
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-300 mb-2">
+                        Прямо сейчас в этом окне облачный рейтинг уже подключён и работает! Если вы переносите файл на свой внешний хостинг и хотите общую базу игроков между разными устройствами:
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-xs text-slate-400">
+                        <li>Создайте бесплатный проект на <strong>console.firebase.google.com</strong>.</li>
+                        <li>Включите <strong>Authentication → Anonymous</strong> и создайте базу <strong>Cloud Firestore</strong>.</li>
+                        <li>Вставьте ваш объект <code class="text-cyber-cyan">firebaseConfig</code> в блок скрипта внизу файла <code class="text-white">index.html</code>.</li>
+                        <li>Даже без настройки внешнего сервера игра автоматически сохраняет весь прогресс игрока и локальную таблицу рекордов прямо в браузере!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Подвал модалки -->
+            <div class="px-6 py-3.5 border-t border-cyber-border bg-slate-950 flex justify-end">
+                <button id="close-deploy-modal-bottom" class="bg-cyber-cyan text-slate-950 font-cyber font-bold text-xs px-5 py-2.5 rounded-xl hover:opacity-90 transition">
+                    Понятно, вернуться в игру
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- УВЕДОМЛЕНИЯ (TOAST) -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- МОДАЛКА ПОДТВЕРЖДЕНИЯ СБРОСА -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-cyber-card border border-red-500/50 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirm-title" class="font-cyber font-bold text-lg text-white mb-2">Подтвердите действие</h3>
+            <p id="confirm-desc" class="text-xs sm:text-sm text-slate-300 mb-5">Вы уверены?</p>
+            <div class="flex gap-3 justify-center">
+                <button id="confirm-cancel" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">Отмена</button>
+                <button id="confirm-accept" class="px-5 py-2 rounded-xl bg-red-600 text-white text-xs font-semibold hover:bg-red-500">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- СКРИПТ ИГРЫ И FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // 1. ЗВУКОВОЙ СИНТЕЗАТОР (WEB AUDIO API)
+        // ==========================================
+        class CyberAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playClick(isCrit = false) {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = isCrit ? 'sawtooth' : 'sine';
+                    const baseFreq = isCrit ? 520 : 280 + Math.random() * 80;
+                    osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(isCrit ? 880 : 120, this.ctx.currentTime + 0.09);
+
+                    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.09);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.09);
+                } catch (e) {}
+            }
+            playUpgrade() {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(330, now);
+                    osc.frequency.setValueAtTime(490, now + 0.06);
+                    osc.frequency.setValueAtTime(660, now + 0.12);
+
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.22);
+                } catch (e) {}
+            }
+            playPrestige() {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    const now = this.ctx.currentTime;
+                    [261.6, 329.6, 392.0, 523.2].forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        gain.gain.setValueAtTime(0.12, now + idx * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.35);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + idx * 0.08);
+                        osc.stop(now + idx * 0.08 + 0.35);
+                    });
+                } catch (e) {}
+            }
+        }
+        const sound = new CyberAudio();
+
+        // ==========================================
+        // 2. КОНФИГУРАЦИЯ УЛУЧШЕНИЙ И СОСТОЯНИЯ
+        // ==========================================
+        const CLICK_UPGRADES_CONFIG = [
+            { id: 'c1', name: 'Нейро-Курсор v1', desc: 'Усиливает импульс пальца при нажатии', baseCost: 15, costMult: 1.5, bonus: 1, icon: 'fa-arrow-pointer' },
+            { id: 'c2', name: 'Тактильные Перчатки', desc: 'Двойной разряд тока при каждом клике', baseCost: 120, costMult: 1.55, bonus: 5, icon: 'fa-mitten' },
+            { id: 'c3', name: 'Кибер-Сустав Mark II', desc: 'Синтетический привод высокой частоты', baseCost: 850, costMult: 1.6, bonus: 25, icon: 'fa-hand-fist' },
+            { id: 'c4', name: 'Плазменный Резонатор', desc: 'Высвобождает пучок плазмы при касании', baseCost: 5200, costMult: 1.65, bonus: 120, icon: 'fa-bolt-lightning' },
+            { id: 'c5', name: 'Квантовый Синапс', desc: 'Мгновенное извлечение блоков из ядра', baseCost: 38000, costMult: 1.7, bonus: 650, icon: 'fa-brain' }
+        ];
+
+        const AUTO_UPGRADES_CONFIG = [
+            { id: 'a1', name: 'Авто-Скрипт Бота', desc: 'Фоновый процесс добычи монет', baseCost: 25, costMult: 1.45, bonus: 2, icon: 'fa-terminal' },
+            { id: 'a2', name: 'Крипто-Риг RTX-9090', desc: 'Домашняя стойка видеокарт на жидком азоте', baseCost: 250, costMult: 1.5, bonus: 14, icon: 'fa-hard-drive' },
+            { id: 'a3', name: 'Кластер ИИ-Серверов', desc: 'Автономная нейросеть для оптимизации хеша', baseCost: 2100, costMult: 1.55, bonus: 90, icon: 'fa-server' },
+            { id: 'a4', name: 'Орбитальный Спутник', desc: 'Перехватывает космические потоки данных', baseCost: 18500, costMult: 1.6, bonus: 540, icon: 'fa-satellite' },
+            { id: 'a5', name: 'Сфера Дайсона', desc: 'Черпает энергию звезды для квантового майнинга', baseCost: 160000, costMult: 1.65, bonus: 3200, icon: 'fa-sun' }
+        ];
+
+        const RANKS = [
+            { min: 0, title: 'Новичок Сети' },
+            { min: 500, title: 'Скрипт-Кидди' },
+            { min: 5000, title: 'Нетраннер' },
+            { min: 50000, title: 'Кибер-Архитектор' },
+            { min: 500000, title: 'Повелитель Сингулярности' },
+            { min: 5000000, title: 'Божество Матрицы' }
+        ];
+
+        let state = {
+            nickname: 'КиберНовичок_' + Math.floor(100 + Math.random() * 899),
+            coins: 0,
+            totalEarned: 0,
+            totalClicks: 0,
+            prestigeLevel: 0,
+            clickLevels: { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 },
+            autoLevels: { a1: 0, a2: 0, a3: 0, a4: 0, a5: 0 },
+            combo: 0
+        };
+
+        // Показатели, вычисляемые динамически
+        let comboTimer = null;
+        let leaderboardList = [];
+
+        // ==========================================
+        // 3. ФОРМАТИРОВАНИЕ И ВЫЧИСЛЕНИЯ
+        // ==========================================
+        function formatNum(num) {
+            num = Math.floor(num);
+            if (num < 1000) return num.toLocaleString('ru-RU');
+            const suffixes = ['', 'тыс.', 'млн', 'млрд', 'трлн', 'квадр.'];
+            const i = Math.floor(Math.log10(num) / 3);
+            if (i >= suffixes.length) return num.toExponential(2);
+            const scaled = num / Math.pow(1000, i);
+            return scaled.toFixed(scaled >= 100 ? 0 : 1) + ' ' + suffixes[i];
+        }
+
+        function getPrestigeMultiplier() {
+            return 1 + (state.prestigeLevel * 0.5);
+        }
+
+        function getComboMultiplier() {
+            // До +50% при максимальном комбо (100%)
+            return 1 + (state.combo / 100) * 0.5;
+        }
+
+        function getClickPower() {
+            let base = 1;
+            CLICK_UPGRADES_CONFIG.forEach(u => {
+                base += (state.clickLevels[u.id] || 0) * u.bonus;
+            });
+            return Math.max(1, Math.floor(base * getPrestigeMultiplier()));
+        }
+
+        function getAutoCPS() {
+            let base = 0;
+            AUTO_UPGRADES_CONFIG.forEach(u => {
+                base += (state.autoLevels[u.id] || 0) * u.bonus;
+            });
+            return Math.floor(base * getPrestigeMultiplier());
+        }
+
+        function getUpgradeCost(cfg, level) {
+            return Math.floor(cfg.baseCost * Math.pow(cfg.costMult, level));
+        }
+
+        function getCurrentRank() {
+            let current = RANKS[0].title;
+            for (const r of RANKS) {
+                if (state.totalEarned >= r.min) current = r.title;
+            }
+            return current;
+        }
+
+        function getPendingPrestigeCores() {
+            if (state.totalEarned < 50000) return 0;
+            const totalPossibleCores = Math.floor(Math.sqrt(state.totalEarned / 25000));
+            return Math.max(0, totalPossibleCores - state.prestigeLevel);
+        }
+
+        // ==========================================
+        // 4. ОТРИСОВКА ИНТЕРФЕЙСА
+        // ==========================================
+        const coinsDisplay = document.getElementById('coins-display');
+        const cpcDisplay = document.getElementById('cpc-display');
+        const cpsDisplay = document.getElementById('cps-display');
+        const prestigeMultDisplay = document.getElementById('prestige-mult-display');
+        const totalEarnedDisplay = document.getElementById('total-earned-display');
+        const totalClicksDisplay = document.getElementById('total-clicks-display');
+        const rankBadge = document.getElementById('rank-badge');
+        const comboDisplay = document.getElementById('combo-display');
+        const comboBar = document.getElementById('combo-bar');
+        const prestigeLevelText = document.getElementById('prestige-level-Text');
+        const prestigeRewardText = document.getElementById('prestige-reward-Text');
+        const prestigeBtn = document.getElementById('prestige-btn');
+
+        function updateUI() {
+            coinsDisplay.textContent = formatNum(state.coins);
+            cpcDisplay.textContent = '+' + formatNum(getClickPower());
+            cpsDisplay.textContent = '+' + formatNum(getAutoCPS()) + '/с';
+            prestigeMultDisplay.textContent = 'x' + getPrestigeMultiplier().toFixed(1);
+            totalEarnedDisplay.textContent = formatNum(state.totalEarned);
+            totalClicksDisplay.textContent = state.totalClicks.toLocaleString('ru-RU');
+            rankBadge.textContent = 'Ранг: ' + getCurrentRank();
+
+            comboDisplay.textContent = 'x' + getComboMultiplier().toFixed(2);
+            comboBar.style.width = state.combo + '%';
+
+            // Обновление доступности кнопок улучшений
+            CLICK_UPGRADES_CONFIG.forEach(cfg => {
+                const lvl = state.clickLevels[cfg.id] || 0;
+                const cost = getUpgradeCost(cfg, lvl);
+                const btn = document.getElementById(`buy-${cfg.id}`);
+                const costEl = document.getElementById(`cost-${cfg.id}`);
+                const lvlEl = document.getElementById(`lvl-${cfg.id}`);
+                if (btn && costEl && lvlEl) {
+                    costEl.textContent = formatNum(cost);
+                    lvlEl.textContent = `Ур. ${lvl}`;
+                    btn.disabled = state.coins < cost;
+                }
+            });
+
+            AUTO_UPGRADES_CONFIG.forEach(cfg => {
+                const lvl = state.autoLevels[cfg.id] || 0;
+                const cost = getUpgradeCost(cfg, lvl);
+                const btn = document.getElementById(`buy-${cfg.id}`);
+                const costEl = document.getElementById(`cost-${cfg.id}`);
+                const lvlEl = document.getElementById(`lvl-${cfg.id}`);
+                if (btn && costEl && lvlEl) {
+                    costEl.textContent = formatNum(cost);
+                    lvlEl.textContent = `Ур. ${lvl}`;
+                    btn.disabled = state.coins < cost;
+                }
+            });
+
+            // Обновление вкладки престижа
+            const pendingCores = getPendingPrestigeCores();
+            prestigeLevelText.textContent = state.prestigeLevel;
+            prestigeRewardText.textContent = `+${pendingCores} ядер`;
+            prestigeBtn.disabled = pendingCores <= 0;
+        }
+
+        function renderUpgradeLists() {
+            const clickContainer = document.getElementById('click-upgrades-list');
+            clickContainer.innerHTML = '';
+            CLICK_UPGRADES_CONFIG.forEach(cfg => {
+                const lvl = state.clickLevels[cfg.id] || 0;
+                const cost = getUpgradeCost(cfg, lvl);
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyber-cyan/40 transition';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan shrink-0">
+                            <i class="fa-solid ${cfg.icon} text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-sm text-white truncate">${cfg.name}</h4>
+                                <span id="lvl-${cfg.id}" class="text-[11px] font-cyber px-2 py-0.5 rounded bg-slate-800 text-cyber-cyan">Ур. ${lvl}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 truncate">${cfg.desc}</p>
+                            <span class="text-[11px] text-emerald-400 font-medium">+${formatNum(cfg.bonus)} к клику</span>
+                        </div>
+                    </div>
+                    <button id="buy-${cfg.id}" class="shrink-0 px-3.5 py-2 rounded-xl font-cyber font-bold text-xs bg-cyber-cyan text-slate-950 hover:bg-cyan-300 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed transition flex flex-col items-end min-w-[95px]">
+                        <span>Купить</span>
+                        <span class="flex items-center gap-1 text-[11px]"><i class="fa-solid fa-coins"></i> <span id="cost-${cfg.id}">${formatNum(cost)}</span></span>
+                    </button>
+                `;
+                clickContainer.appendChild(item);
+                document.getElementById(`buy-${cfg.id}`).addEventListener('click', () => buyUpgrade('click', cfg));
+            });
+
+            const autoContainer = document.getElementById('auto-upgrades-list');
+            autoContainer.innerHTML = '';
+            AUTO_UPGRADES_CONFIG.forEach(cfg => {
+                const lvl = state.autoLevels[cfg.id] || 0;
+                const cost = getUpgradeCost(cfg, lvl);
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyber-pink/40 transition';
+                item.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-xl bg-cyber-pink/10 border border-cyber-pink/30 flex items-center justify-center text-cyber-pink shrink-0">
+                            <i class="fa-solid ${cfg.icon} text-lg"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-sm text-white truncate">${cfg.name}</h4>
+                                <span id="lvl-${cfg.id}" class="text-[11px] font-cyber px-2 py-0.5 rounded bg-slate-800 text-cyber-pink">Ур. ${lvl}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 truncate">${cfg.desc}</p>
+                            <span class="text-[11px] text-cyber-pink font-medium">+${formatNum(cfg.bonus)} монет/сек</span>
+                        </div>
+                    </div>
+                    <button id="buy-${cfg.id}" class="shrink-0 px-3.5 py-2 rounded-xl font-cyber font-bold text-xs bg-cyber-pink text-white hover:bg-pink-500 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed transition flex flex-col items-end min-w-[95px]">
+                        <span>Купить</span>
+                        <span class="flex items-center gap-1 text-[11px]"><i class="fa-solid fa-coins"></i> <span id="cost-${cfg.id}">${formatNum(cost)}</span></span>
+                    </button>
+                `;
+                autoContainer.appendChild(item);
+                document.getElementById(`buy-${cfg.id}`).addEventListener('click', () => buyUpgrade('auto', cfg));
+            });
+        }
+
+        // ==========================================
+        // 5. ИГРОВАЯ МЕХАНИКА (КЛИК, ПОКУПКА, ПРЕСТИЖ)
+        // ==========================================
+        function spawnFloatingNumber(x, y, amount, isCrit) {
+            const el = document.createElement('div');
+            el.className = 'floating-number ' + (isCrit ? 'text-cyber-pink text-2xl neon-text-pink' : 'text-cyber-cyan text-lg neon-text-cyan');
+            el.textContent = (isCrit ? 'КРИТ! +' : '+') + formatNum(amount);
+            const offsetX = (Math.random() - 0.5) * 50;
+            el.style.left = `${x + offsetX}px`;
+            el.style.top = `${y - 20}px`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 850);
+        }
+
+        function handleMainClick(e) {
+            const isCrit = Math.random() < 0.05; // 5% шанс критического клика x3
+            state.combo = Math.min(100, state.combo + 6);
+
+            clearTimeout(comboTimer);
+            comboTimer = setTimeout(() => {
+                const decay = setInterval(() => {
+                    if (state.combo > 0) {
+                        state.combo = Math.max(0, state.combo - 5);
+                        updateUI();
+                    } else {
+                        clearInterval(decay);
+                    }
+                }, 150);
+            }, 1200);
+
+            let gain = Math.floor(getClickPower() * getComboMultiplier());
+            if (isCrit) gain *= 3;
+
+            state.coins += gain;
+            state.totalEarned += gain;
+            state.totalClicks += 1;
+
+            sound.playClick(isCrit);
+
+            // Координаты для анимации
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+            if (!clientX || !clientY) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                clientX = rect.left + rect.width / 2;
+                clientY = rect.top + rect.height / 2;
+            }
+            spawnFloatingNumber(clientX, clientY, gain, isCrit);
+            updateUI();
+        }
+
+        function buyUpgrade(type, cfg) {
+            const map = type === 'click' ? state.clickLevels : state.autoLevels;
+            const currentLvl = map[cfg.id] || 0;
+            const cost = getUpgradeCost(cfg, currentLvl);
+
+            if (state.coins >= cost) {
+                state.coins -= cost;
+                map[cfg.id] = currentLvl + 1;
+                sound.playUpgrade();
+                updateUI();
+                saveProgressCloud();
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const borderColor = type === 'success' ? 'border-cyber-cyan' : 'border-cyber-pink';
+            toast.className = `bg-slate-900/95 border ${borderColor} text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium flex items-center gap-2 transition-all`;
+            toast.innerHTML = `<i class="fa-solid fa-bolt text-cyber-cyan"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Модалка подтверждения
+        let confirmCallback = null;
+        const confirmModal = document.getElementById('confirm-modal');
+        function openConfirmModal(title, desc, onConfirm) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-desc').textContent = desc;
+            confirmCallback = onConfirm;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex');
+        }
+        document.getElementById('confirm-cancel').addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+        });
+        document.getElementById('confirm-accept').addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+            if (confirmCallback) confirmCallback();
+        });
+
+        // Престиж
+        prestigeBtn.addEventListener('click', () => {
+            const reward = getPendingPrestigeCores();
+            if (reward <= 0) return;
+            openConfirmModal(
+                'Квантовая Перезагрузка',
+                `Сбросить текущие монеты и улучшения ради +${reward} Квантовых Ядер (+${reward * 50}% к доходу навсегда)?`,
+                () => {
+                    state.prestigeLevel += reward;
+                    state.coins = 0;
+                    state.clickLevels = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 };
+                    state.autoLevels = { a1: 0, a2: 0, a3: 0, a4: 0, a5: 0 };
+                    sound.playPrestige();
+                    renderUpgradeLists();
+                    updateUI();
+                    saveProgressCloud();
+                    showToast(`Престиж повышен! Ваш бонус: x${getPrestigeMultiplier().toFixed(1)}`, 'success');
+                }
+            );
+        });
+
+        // Полный сброс
+        document.getElementById('hard-reset-btn').addEventListener('click', () => {
+            openConfirmModal(
+                'Полный сброс прогресса',
+                'Вы уверены, что хотите обнулить абсолютно все монеты, апгрейды и уровни престижа?',
+                () => {
+                    state.coins = 0;
+                    state.totalEarned = 0;
+                    state.totalClicks = 0;
+                    state.prestigeLevel = 0;
+                    state.clickLevels = { c1: 0, c2: 0, c3: 0, c4: 0, c5: 0 };
+                    state.autoLevels = { a1: 0, a2: 0, a3: 0, a4: 0, a5: 0 };
+                    renderUpgradeLists();
+                    updateUI();
+                    saveProgressCloud();
+                    showToast('Прогресс полностью сброшен');
+                }
+            );
+        });
+
+        // ==========================================
+        // 6. FIREBASE AUTH & FIRESTORE (ОБЛАКО И РЕЙТИНГ)
+        // ==========================================
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cyber-clicker-global';
+
+        const cloudDot = document.getElementById('cloud-dot');
+        const cloudText = document.getElementById('cloud-text');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        function setCloudStatus(online, text) {
+            if (online) {
+                cloudDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+            } else {
+                cloudDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+            }
+            cloudText.textContent = text;
+        }
+
+        async function initFirebase() {
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    setCloudStatus(false, 'Автономный режим');
+                    renderLeaderboardTable([]);
+                    return;
+                }
+
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                // Правило 3: Сначала выполняем авторизацию
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (!user) return;
+                    currentUser = user;
+                    userIdDisplay.textContent = user.uid;
+                    setCloudStatus(true, 'Облако активно');
+
+                    // Загружаем сохранённый прогресс игрока из его приватной коллекции
+                    await loadUserProgressFromCloud();
+
+                    // Подписываемся на глобальный рейтинг в реальном времени
+                    subscribeToLeaderboard();
+                });
+            } catch (err) {
+                console.error('Ошибка инициализации облака:', err);
+                setCloudStatus(false, 'Локальная сессия');
+            }
+        }
+
+        async function loadUserProgressFromCloud() {
+            if (!currentUser || !db) return;
+            try {
+                const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'gameState', 'profile');
+                const snap = await getDoc(saveRef);
+                if (snap.exists()) {
+                    const data = snap.data();
+                    state.nickname = data.nickname || state.nickname;
+                    state.coins = Number(data.coins) || 0;
+                    state.totalEarned = Number(data.totalEarned) || 0;
+                    state.totalClicks = Number(data.totalClicks) || 0;
+                    state.prestigeLevel = Number(data.prestigeLevel) || 0;
+                    if (data.clickLevels) state.clickLevels = JSON.parse(data.clickLevels);
+                    if (data.autoLevels) state.autoLevels = JSON.parse(data.autoLevels);
+
+                    document.getElementById('nickname-input').value = state.nickname;
+                    renderUpgradeLists();
+                    updateUI();
+                    showToast('Прогресс загружен из облака!', 'success');
+                } else {
+                    // Первое сохранение нового игрока
+                    await saveProgressCloud();
+                }
+            } catch (err) {
+                console.error('Ошибка чтения сохранения:', err);
+            }
+        }
+
+        async function saveProgressCloud() {
+            if (!currentUser || !db) return;
+            try {
+                // 1. Сохраняем приватный профиль игрока
+                const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'gameState', 'profile');
+                await setDoc(saveRef, {
+                    nickname: state.nickname,
+                    coins: Math.floor(state.coins),
+                    totalEarned: Math.floor(state.totalEarned),
+                    totalClicks: state.totalClicks,
+                    prestigeLevel: state.prestigeLevel,
+                    clickLevels: JSON.stringify(state.clickLevels),
+                    autoLevels: JSON.stringify(state.autoLevels),
+                    updatedAt: Date.now()
+                });
+
+                // 2. Обновляем публичную запись в глобальном рейтинге
+                const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
+                await setDoc(lbRef, {
+                    uid: currentUser.uid,
+                    nickname: state.nickname,
+                    totalEarned: Math.floor(state.totalEarned),
+                    cps: getAutoCPS(),
+                    prestigeLevel: state.prestigeLevel,
+                    updatedAt: Date.now()
+                });
+            } catch (err) {
+                console.error('Ошибка сохранения в облако:', err);
+            }
+        }
+
+        function subscribeToLeaderboard() {
+            if (!currentUser || !db) return;
+            const lbCollection = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
+
+            // Правило 2: Простой запрос без orderBy/limit, сортировка в памяти JS
+            onSnapshot(lbCollection, (snapshot) => {
+                const players = [];
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if (d && d.nickname) {
+                        players.push(d);
+                    }
+                });
+
+                // Сортируем по убыванию общего заработка
+                players.sort((a, b) => (b.totalEarned || 0) - (a.totalEarned || 0));
+                leaderboardList = players.slice(0, 30);
+                renderLeaderboardTable(leaderboardList);
+            }, (error) => {
+                console.error('Ошибка получения таблицы лидеров:', error);
+            });
+        }
+
+        function renderLeaderboardTable(players) {
+            const tbody = document.getElementById('leaderboard-body');
+            if (!players || players.length === 0) {
+                // Если облако пустое, показываем текущего игрока
+                players = [{
+                    uid: currentUser ? currentUser.uid : 'local',
+                    nickname: state.nickname,
+                    totalEarned: state.totalEarned,
+                    cps: getAutoCPS(),
+                    prestigeLevel: state.prestigeLevel
+                }];
+            }
+
+            tbody.innerHTML = '';
+            players.forEach((p, idx) => {
+                const rank = idx + 1;
+                const isMe = currentUser && p.uid === currentUser.uid;
+                let rankBadgeHtml = `<span class="text-slate-400 font-cyber">${rank}</span>`;
+                if (rank === 1) rankBadgeHtml = `<span class="text-amber-400 font-cyber text-base"><i class="fa-solid fa-crown"></i> 1</span>`;
+                else if (rank === 2) rankBadgeHtml = `<span class="text-slate-200 font-cyber"><i class="fa-solid fa-medal"></i> 2</span>`;
+                else if (rank === 3) rankBadgeHtml = `<span class="text-amber-600 font-cyber"><i class="fa-solid fa-medal"></i> 3</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = isMe ? 'bg-cyber-cyan/10 border-l-2 border-l-cyber-cyan' : 'hover:bg-slate-900/60 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-3">${rankBadgeHtml}</td>
+                    <td class="py-3 px-3">
+                        <div class="flex items-center gap-2">
+                            <span class="font-semibold ${isMe ? 'text-cyber-cyan' : 'text-white'}">${escapeHtml(p.nickname)}</span>
+                            ${isMe ? '<span class="text-[10px] bg-cyber-cyan/20 text-cyber-cyan px-1.5 py-0.5 rounded">ВЫ</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 text-right font-cyber text-white font-bold">${formatNum(p.totalEarned || 0)}</td>
+                    <td class="py-3 px-3 text-right font-cyber text-cyber-pink hidden sm:table-cell">+${formatNum(p.cps || 0)}/с</td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded-full text-xs font-cyber bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            ★ ${p.prestigeLevel || 0}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, s => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
+        }
+
+        // ==========================================
+        // 7. ОБРАБОТЧИКИ СОБЫТИЙ И ТАЙМЕРЫ
+        // ==========================================
+        document.getElementById('nickname-input').value = state.nickname;
+
+        // Сохранение никнейма
+        document.getElementById('save-name-btn').addEventListener('click', () => {
+            const val = document.getElementById('nickname-input').value.trim();
+            if (val.length >= 2) {
+                state.nickname = val;
+                saveProgressCloud();
+                showToast(`Никнейм «${val}» сохранён в рейтинге!`, 'success');
+            } else {
+                showToast('Введите минимум 2 символа для никнейма');
+            }
+        });
+
+        // Клик по ядру (мышь + клавиша пробел)
+        const mainClickBtn = document.getElementById('main-click-btn');
+        mainClickBtn.addEventListener('click', handleMainClick);
+
+        // Переключение вкладок
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-tab');
+                tabBtns.forEach(b => {
+                    b.className = 'tab-btn flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent';
+                });
+                btn.className = 'tab-btn active-tab flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-xs sm:text-sm transition bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40';
+
+                tabPanes.forEach(pane => pane.classList.add('hidden'));
+                document.getElementById(target).classList.remove('hidden');
+            });
+        });
+
+        // Кнопка звука
+        document.getElementById('sound-toggle').addEventListener('click', () => {
+            sound.muted = !sound.muted;
+            const icon = document.getElementById('sound-icon');
+            icon.className = sound.muted ? 'fa-solid fa-volume-xmark text-sm text-red-400' : 'fa-solid fa-volume-high text-sm';
+            showToast(sound.muted ? 'Звук выключен' : 'Звук включен');
+        });
+
+        // Ручное обновление в рейтинге
+        document.getElementById('refresh-lb-btn').addEventListener('click', () => {
+            saveProgressCloud();
+            showToast('Ваш рекорд отправлен в глобальный рейтинг!', 'success');
+        });
+        document.getElementById('force-sync-btn').addEventListener('click', () => {
+            saveProgressCloud();
+            showToast('Прогресс синхронизирован с облаком!', 'success');
+        });
+
+        // Модальное окно инструкции по деплою
+        const deployModal = document.getElementById('deploy-modal');
+        document.getElementById('open-deploy-modal').addEventListener('click', () => {
+            deployModal.classList.remove('hidden');
+            deployModal.classList.add('flex');
+        });
+        const closeDeploy = () => {
+            deployModal.classList.add('hidden');
+            deployModal.classList.remove('flex');
+        };
+        document.getElementById('close-deploy-modal').addEventListener('click', closeDeploy);
+        document.getElementById('close-deploy-modal-bottom').addEventListener('click', closeDeploy);
+
+        // Запуск пассивного дохода (10 тиков в секунду для плавности счетчика)
+        setInterval(() => {
+            const cps = getAutoCPS();
+            if (cps > 0) {
+                const tickGain = cps / 10;
+                state.coins += tickGain;
+                state.totalEarned += tickGain;
+                updateUI();
+            }
+        }, 100);
+
+        // Автоматическая отправка рекорда в облачный рейтинг каждые 10 секунд
+        setInterval(() => {
+            saveProgressCloud();
+        }, 10000);
+
+        // Первоначальный запуск
+        renderUpgradeLists();
+        updateUI();
+        initFirebase();
+    </script>
+</body>
+</html>
